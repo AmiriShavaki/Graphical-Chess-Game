@@ -44,12 +44,31 @@ cell piece::getPos() {
     return pos;
 }
 
+class king: public piece {
+};
+
+class queen: public piece {
+};
+
+class rook: public piece {
+};
+
+class bishop: public piece {
+};
+
+class knight: public piece {
+};
+
+class pawn: public piece {
+};
+
 class board {
 public:
     board();
     bool isRunning();
 private:
     bool gameIsOver;
+    int turn;
 };
 
 board::board() {
