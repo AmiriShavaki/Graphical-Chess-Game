@@ -62,6 +62,15 @@ class knight: public piece {
 class pawn: public piece {
 };
 
+class player {
+    king playerKing;
+    queen playerQueen;
+    rook playerRooks[2];
+    bishop playerBishops[2];
+    knight playerBishops[2];
+    pawn playerPawns[8];
+};
+
 class board {
 public:
     board();
@@ -69,6 +78,7 @@ public:
 private:
     bool gameIsOver;
     int turn;
+    player white, black;
 };
 
 board::board() {
@@ -91,6 +101,11 @@ int main() {
     piece anHorse(startingCell);
     cout << anHorse.getPos().getX() << ' ' << anHorse.getPos().getY() << '\n';
     */
+
+    board game; //object of running gameTable
+
+    while (game.isRunning()) { //mainLoop
+    }
 
     //getch();
 }
