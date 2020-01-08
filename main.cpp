@@ -35,6 +35,36 @@ private:
     bool isAlive;
 };
 
+class king: public piece {
+public:
+    using piece::piece;
+};
+
+class queen: public piece {
+public:
+    using piece::piece;
+};
+
+class rook: public piece {
+public:
+    using piece::piece;
+};
+
+class bishop: public piece {
+public:
+    using piece::piece;
+};
+
+class knight: public piece {
+public:
+    using piece::piece;
+};
+
+class pawn: public piece {
+public:
+    using piece::piece;
+};
+
 piece::piece(cell givenCell) {
     isAlive = true;
     pos = givenCell;
@@ -44,49 +74,43 @@ cell piece::getPos() {
     return pos;
 }
 
-class king: public piece {
-};
-
-class queen: public piece {
-};
-
-class rook: public piece {
-};
-
-class bishop: public piece {
-};
-
-class knight: public piece {
-};
-
-class pawn: public piece {
-};
-
 class player {
+private:
     king playerKing;
     queen playerQueen;
     rook playerRooks[2];
     bishop playerBishops[2];
-    knight playerBishops[2];
+    knight playerKnights[2];
     pawn playerPawns[8];
 };
+
+enum playerColor {White, Black};
 
 class board {
 public:
     board();
     bool isRunning();
+    playerColor getTurn();
+    bool isChecked(player attacker, player deffender);
+    bool isCheckmated(player attacker, player deffender);
+    bool isStalemated(player attacker, player deffender);
 private:
     bool gameIsOver;
-    int turn;
+    playerColor turn;
     player white, black;
 };
 
 board::board() {
     gameIsOver = false;
+    turn = White;
 }
 
 bool board::isRunning() {
     return !gameIsOver;
+}
+
+playerColor board::getTurn() {
+    return turn;
 }
 
 int main() {
@@ -105,7 +129,12 @@ int main() {
     board game; //object of running gameTable
 
     while (game.isRunning()) { //mainLoop
+        while (game.getTurn() == White) {
+            delay(100);
+        }
+        while (game.getTurn() == Black) {
+            delay(100);
+        }
     }
-
     //getch();
 }
