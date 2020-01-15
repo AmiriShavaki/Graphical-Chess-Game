@@ -1,5 +1,6 @@
 #include <iostream>
 #include <graphics.h>
+#include <vector>
 
 using namespace std;
 
@@ -28,44 +29,68 @@ int cell::getY() {
 
 class piece {
 public:
-    piece(cell);
     cell getPos();
-private:
+protected:
     cell pos;
     bool isAlive;
 };
 
 class king: public piece {
 public:
-    using piece::piece;
+    king(cell);
 };
 
 class queen: public piece {
 public:
-    using piece::piece;
+    queen(cell);
 };
 
 class rook: public piece {
 public:
-    using piece::piece;
+    rook(cell);
 };
 
 class bishop: public piece {
 public:
-    using piece::piece;
+    bishop(cell);
 };
 
 class knight: public piece {
 public:
-    using piece::piece;
+    knight(cell);
 };
 
 class pawn: public piece {
 public:
-    using piece::piece;
+    pawn(cell);
 };
 
-piece::piece(cell givenCell) {
+king::king(cell givenCell) {
+    isAlive = true;
+    pos = givenCell;
+}
+
+queen::queen(cell givenCell) {
+    isAlive = true;
+    pos = givenCell;
+}
+
+rook::rook(cell givenCell) {
+    isAlive = true;
+    pos = givenCell;
+}
+
+bishop::bishop(cell givenCell) {
+    isAlive = true;
+    pos = givenCell;
+}
+
+knight::knight(cell givenCell) {
+    isAlive = true;
+    pos = givenCell;
+}
+
+pawn::pawn(cell givenCell) {
     isAlive = true;
     pos = givenCell;
 }
@@ -75,13 +100,14 @@ cell piece::getPos() {
 }
 
 class player {
+public:
 private:
-    king playerKing;
-    queen playerQueen;
-    rook playerRooks[2];
-    bishop playerBishops[2];
-    knight playerKnights[2];
-    pawn playerPawns[8];
+    vector <king> playerKing;
+    vector <queen> playerQueen;
+    vector <rook> playerRooks;
+    vector <bishop> playerBishops;
+    vector <knight> playerKnights;
+    vector <pawn> playerPawns;
 };
 
 enum playerColor {White, Black};
@@ -115,7 +141,6 @@ playerColor board::getTurn() {
 
 int main() {
     //initwindow(800,600);
-
     /* In case we want to test cell class
     cell tst(100, 200);
     cout << tst.getX() << ' ' << tst.getY() << '\n'; */
