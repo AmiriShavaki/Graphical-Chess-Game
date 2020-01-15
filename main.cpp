@@ -140,7 +140,7 @@ playerColor board::getTurn() {
 }
 
 int main() {
-    //initwindow(800,600);
+    initwindow(400,400);
     /* In case we want to test cell class
     cell tst(100, 200);
     cout << tst.getX() << ' ' << tst.getY() << '\n'; */
@@ -155,10 +155,16 @@ int main() {
 
     while (game.isRunning()) { //mainLoop
         while (game.getTurn() == White) {
-            delay(100);
+            while (!kbhit()) {
+                int firstClickX, secondClickX, firstClickY, secondClickY;
+                delay(100);
+            }
         }
         while (game.getTurn() == Black) {
-            delay(100);
+            while (!kbhit()) {
+                int firstClickX, secondClickX, firstClickY, secondClickY;
+                delay(100);
+            }
         }
     }
     //getch();

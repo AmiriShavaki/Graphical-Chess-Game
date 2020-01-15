@@ -1,5 +1,6 @@
 # depslib dependency file v1.0
-1579081429 source:c:\users\amiri\documents\fp\chess\main.cpp
+1579084541 source:c:\users\amiri\documents\fp\chess\main.cpp
 	<iostream>
 	<graphics.h>
+	<vector>
 
