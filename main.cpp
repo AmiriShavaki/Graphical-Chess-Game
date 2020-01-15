@@ -115,6 +115,7 @@ enum playerColor {White, Black};
 class board {
 public:
     board();
+    void updateBoard();
     bool isRunning();
     playerColor getTurn();
     bool isChecked(player attacker, player deffender);
@@ -127,8 +128,26 @@ private:
 };
 
 board::board() {
+    initwindow(408,412);
+    updateBoard();
     gameIsOver = false;
     turn = White;
+}
+
+void board::updateBoard() {
+    int xposition;
+    int yposition;
+    for(yposition = 0 ; yposition <= 400 ; yposition = yposition + 50) {
+        for(xposition = 0 ; xposition <= 400 ; xposition = xposition + 50) {
+            if((xposition + yposition) % 100 == 0) {
+                setfillstyle(1 , 15);
+                bar(xposition , yposition , xposition + 50 , yposition + 50);
+            } else {
+                setfillstyle(1 , 2);
+                bar(xposition , yposition , xposition + 50 , yposition + 50);
+            }
+        }
+    }
 }
 
 bool board::isRunning() {
@@ -140,7 +159,7 @@ playerColor board::getTurn() {
 }
 
 int main() {
-    initwindow(400,400);
+    //initwindow(400,400);
     /* In case we want to test cell class
     cell tst(100, 200);
     cout << tst.getX() << ' ' << tst.getY() << '\n'; */
@@ -159,12 +178,14 @@ int main() {
                 int firstClickX, secondClickX, firstClickY, secondClickY;
                 delay(100);
             }
+            game.updateBoard();
         }
         while (game.getTurn() == Black) {
             while (!kbhit()) {
                 int firstClickX, secondClickX, firstClickY, secondClickY;
                 delay(100);
             }
+            game.updateBoard();
         }
     }
     //getch();
