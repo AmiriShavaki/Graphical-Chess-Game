@@ -1,6 +1,6 @@
 #include <iostream>
-#include <graphics.h>
 #include <vector>
+#include <SDL.h>
 
 using namespace std;
 
@@ -125,31 +125,24 @@ private:
     bool gameIsOver;
     playerColor turn;
     player white, black;
+    SDL_Window* window = NULL;
+    SDL_Surface* screenSurface = NULL;
+    SDL_Surface* background = NULL;
 };
 
 board::board() {
-    initwindow(408,412);
+    window = SDL_CreateWindow("Chess", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 400, 400, SDL_WINDOW_SHOWN);
+    screenSurface = SDL_GetWindowSurface(window);
+    background = SDL_LoadBMP("background.bmp");
     updateBoard();
     gameIsOver = false;
     turn = White;
 }
 
 void board::updateBoard() {
-    int xposition;
-    int yposition;
-    for(yposition = 0 ; yposition <= 400 ; yposition = yposition + 50) {
-        for(xposition = 0 ; xposition <= 400 ; xposition = xposition + 50) {
-            if((xposition + yposition) % 100 == 0) {
-                setfillstyle(1 , 15);
-                bar(xposition , yposition , xposition + 50 , yposition + 50);
-            } else {
-                setfillstyle(1 , 2);
-                bar(xposition , yposition , xposition + 50 , yposition + 50);
-            }
-        }
-    }
+    SDL_BlitSurface(background, NULL, screenSurface, NULL);
+    SDL_UpdateWindowSurface(window);
 }
-
 bool board::isRunning() {
     return !gameIsOver;
 }
@@ -158,35 +151,25 @@ playerColor board::getTurn() {
     return turn;
 }
 
-int main() {
-    //initwindow(400,400);
-    /* In case we want to test cell class
-    cell tst(100, 200);
-    cout << tst.getX() << ' ' << tst.getY() << '\n'; */
-
-    /* In case we want to test piece class
-    cell startingCell(100, 200);
-    piece anHorse(startingCell);
-    cout << anHorse.getPos().getX() << ' ' << anHorse.getPos().getY() << '\n';
-    */
-
+int main(int argc, char* args[]) {
     board game; //object of running gameTable
 
     while (game.isRunning()) { //mainLoop
         while (game.getTurn() == White) {
-            while (!kbhit()) {
+            /*while (!kbhit()) {
                 int firstClickX, secondClickX, firstClickY, secondClickY;
                 delay(100);
-            }
+            }*/
             game.updateBoard();
+            SDL_Delay(1000);
         }
         while (game.getTurn() == Black) {
-            while (!kbhit()) {
+            /*while (!kbhit()) {
                 int firstClickX, secondClickX, firstClickY, secondClickY;
                 delay(100);
-            }
+            }*/
             game.updateBoard();
+            SDL_Delay(1000);
         }
     }
-    //getch();
 }
