@@ -73,12 +73,15 @@ king::king(cell givenCell) {
     isAlive = true;
     pos = givenCell;
     SDL_Surface* kingSurface = NULL;
-    kingSurface = SDL_LoadBMP("bishop.bmp");
-    if (kingSurface == NULL) {cout<<"lanat";;}
+    if (pos.getY() == 0) {
+        kingSurface = SDL_LoadBMP("pieces\\whiteGreenBackground\\king.bmp");
+    } else {
+        kingSurface = SDL_LoadBMP("pieces\\blackWhiteBackground\\king.bmp");
+    }
     kingSurface = SDL_ConvertSurface(kingSurface, screenSurface -> format, 0);
     SDL_Rect position;
-    position.x = 120;
-    position.y = 120;
+    position.x = pos.getX() * 50;
+    position.y = pos.getY() * 50;
     position.w = 50;
     position.h = 50;
     SDL_BlitScaled(kingSurface, NULL, screenSurface, &position);
@@ -114,8 +117,11 @@ cell piece::getPos() {
     return pos;
 }
 
+enum playerColor {White, Black};
+
 class player {
 public:
+    player(playerColor = White);
 private:
     vector <king> playerKing;
     vector <queen> playerQueen;
@@ -125,7 +131,18 @@ private:
     vector <pawn> playerPawns;
 };
 
-enum playerColor {White, Black};
+player::player(playerColor color) {
+    if (color == White) {
+        cell position(4, 0);
+        king tempKing(position);
+        playerKing.push_back(tempKing);
+    } else {
+        cout << "lanat";
+        cell position(4, 7);
+        king tempKing(position);
+        playerKing.push_back(tempKing);
+    }
+}
 
 class board {
 public:
@@ -139,7 +156,6 @@ public:
 private:
     bool gameIsOver;
     playerColor turn;
-    player white, black;
     SDL_Surface* background = NULL;
 };
 
@@ -150,13 +166,12 @@ board::board() {
     updateBoard();
     gameIsOver = false;
     turn = White;
+    player white(White), black(Black);
+    SDL_UpdateWindowSurface(window);
 }
 
 void board::updateBoard() {
     SDL_BlitSurface(background, NULL, screenSurface, NULL);
-    SDL_UpdateWindowSurface(window);
-    cell pos(10, 10);
-    king aDonkeyKing(pos);
 }
 
 bool board::isRunning() {
