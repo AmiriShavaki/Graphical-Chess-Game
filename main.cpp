@@ -73,7 +73,7 @@ king::king(cell givenCell) {
     isAlive = true;
     pos = givenCell;
     SDL_Surface* kingSurface = NULL;
-    kingSurface = SDL_LoadBMP("king.bmp");
+    kingSurface = SDL_LoadBMP("bishop.bmp");
     if (kingSurface == NULL) {cout<<"lanat";;}
     kingSurface = SDL_ConvertSurface(kingSurface, screenSurface -> format, 0);
     SDL_Rect position;
