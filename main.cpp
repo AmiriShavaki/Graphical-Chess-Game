@@ -85,32 +85,113 @@ king::king(cell givenCell) {
     position.w = 50;
     position.h = 50;
     SDL_BlitScaled(kingSurface, NULL, screenSurface, &position);
-    SDL_UpdateWindowSurface(window);
+
 }
 
 queen::queen(cell givenCell) {
     isAlive = true;
     pos = givenCell;
+    SDL_Surface* queenSurface = NULL;
+    if (pos.getY() == 0 && pos.getX() == 3) {
+        queenSurface = SDL_LoadBMP("pieces\\whiteWhiteBackground\\queen.bmp");
+    } else if (pos.getY() == 7 && pos.getX() == 3) {
+        queenSurface = SDL_LoadBMP("pieces\\blackGreenBackground\\queen.bmp");
+    }
+    queenSurface = SDL_ConvertSurface(queenSurface , screenSurface -> format , 0);
+    SDL_Rect position;
+    position.x = pos.getX() * 50;
+    position.y = pos.getY() * 50;
+    position.w = 50;
+    position.h = 50;
+    SDL_BlitScaled(queenSurface, NULL, screenSurface, &position);
 }
 
 rook::rook(cell givenCell) {
     isAlive = true;
     pos = givenCell;
+    SDL_Surface* rookSurface = NULL;
+    if (pos.getY() == 0 && pos.getX() == 7) {
+        rookSurface = SDL_LoadBMP("pieces\\whiteWhiteBackground\\rook.bmp");
+    } else if (pos.getY() == 0 && pos.getX() == 0) {
+        rookSurface = SDL_LoadBMP("pieces\\whiteGreenBackground\\rook.bmp");
+    } else if (pos.getX() == 0 && pos.getY() == 7) {
+        rookSurface = SDL_LoadBMP("pieces\\blackWhiteBackground\\rook.bmp");
+    }  else if (pos.getX() == 7 && pos.getY() == 7) {
+        rookSurface = SDL_LoadBMP("pieces\\blackGreenBackground\\rook.bmp");
+    }
+    rookSurface = SDL_ConvertSurface(rookSurface , screenSurface -> format , 0);
+    SDL_Rect position;
+    position.x = pos.getX() * 50;
+    position.y = pos.getY() * 50;
+    position.w = 50;
+    position.h = 50;
+    SDL_BlitScaled(rookSurface, NULL, screenSurface, &position);
 }
 
 bishop::bishop(cell givenCell) {
     isAlive = true;
     pos = givenCell;
+    SDL_Surface* bishopSurface = NULL;
+    if(pos.getX() == 1 && pos.getY() == 0) {
+        bishopSurface = SDL_LoadBMP("pieces\\whiteWhiteBackground\\bishop.bmp");
+    } else if(pos.getX() == 6 && pos.getY() == 0) {
+        bishopSurface = SDL_LoadBMP("pieces\\whiteGreenBackground\\bishop.bmp");
+    } else if(pos.getX() == 1 && pos.getY() == 7) {
+        bishopSurface = SDL_LoadBMP("pieces\\blackGreenBackground\\bishop.bmp");
+    } if(pos.getX() == 6 && pos.getY() == 7) {
+        bishopSurface = SDL_LoadBMP("pieces\\blackWhiteBackground\\bishop.bmp");
+    }
+    bishopSurface = SDL_ConvertSurface(bishopSurface , screenSurface -> format , 0);
+    SDL_Rect position;
+    position.x = pos.getX() * 50;
+    position.y = pos.getY() * 50;
+    position.w = 50;
+    position.h = 50;
+    SDL_BlitScaled(bishopSurface, NULL, screenSurface, &position);
 }
 
 knight::knight(cell givenCell) {
     isAlive = true;
     pos = givenCell;
+    SDL_Surface* knightSurface = NULL;
+    if(pos.getX() == 5 && pos.getY() == 0) {
+        knightSurface = SDL_LoadBMP("pieces\\whiteWhiteBackground\\knight.bmp");
+    } else if(pos.getX() == 2 && pos.getY() == 0) {
+        knightSurface = SDL_LoadBMP("pieces\\whiteGreenBackground\\knight.bmp");
+    } else if(pos.getX() == 5 && pos.getY() == 7) {
+        knightSurface = SDL_LoadBMP("pieces\\blackGreenBackground\\knight.bmp");
+    } if(pos.getX() == 2 && pos.getY() == 7) {
+        knightSurface = SDL_LoadBMP("pieces\\blackWhiteBackground\\knight.bmp");
+    }
+    knightSurface = SDL_ConvertSurface(knightSurface , screenSurface -> format , 0);
+    SDL_Rect position;
+    position.x = pos.getX() * 50;
+    position.y = pos.getY() * 50;
+    position.w = 50;
+    position.h = 50;
+    SDL_BlitScaled(knightSurface, NULL, screenSurface, &position);
 }
 
 pawn::pawn(cell givenCell) {
     isAlive = true;
     pos = givenCell;
+    SDL_Surface* pawnSurface = NULL;
+    if(pos.getY() == 1 && pos.getX() % 2 == 0) {
+        pawnSurface = SDL_LoadBMP("pieces\\whiteWhiteBackground\\pawn.bmp");
+    } else if (pos.getY() == 1 && pos.getX() % 2 != 0) {
+        pawnSurface = SDL_LoadBMP("pieces\\whiteGreenBackground\\pawn.bmp");
+    } else if (pos.getY() == 6 && pos.getX() % 2 == 0) {
+        pawnSurface = SDL_LoadBMP("pieces\\blackGreenBackground\\pawn.bmp");
+    } else if (pos.getY() == 6 && pos.getX() % 2 != 0) {
+        pawnSurface = SDL_LoadBMP("pieces\\blackWhiteBackground\\pawn.bmp");
+    }
+    pawnSurface = SDL_ConvertSurface(pawnSurface , screenSurface -> format , 0);
+    SDL_Rect position;
+    position.x = pos.getX() * 50;
+    position.y = pos.getY() * 50;
+    position.h = 50;
+    position.w = 50;
+    SDL_BlitScaled(pawnSurface, NULL, screenSurface, &position);
 }
 
 cell piece::getPos() {
@@ -132,12 +213,64 @@ private:
 };
 
 player::player(playerColor color) {
+    int counter;
     if (color == White) {
-        cell position(4, 0);
-        king tempKing(position);
+        cell positionRook1(0, 0);
+        rook tempRook1(positionRook1);
+        playerRooks.push_back(tempRook1);
+        cell positionRook2(7, 0);
+        rook tempRook2(positionRook2);
+        playerRooks.push_back(tempRook2);
+        cell positionBishop1(1, 0);
+        bishop tempBishop1(positionBishop1);
+        playerBishops.push_back(tempBishop1);
+        cell positionBishop2(6, 0);
+        bishop tempBishop2(positionBishop2);
+        playerBishops.push_back(tempBishop2);
+        cell positionKnight1(2, 0);
+        knight tempKnight1(positionKnight1);
+        playerKnights.push_back(tempKnight1);
+        cell positionKnight2(5, 0);
+        knight tempKnight2(positionKnight2);
+        playerKnights.push_back(tempKnight2);
+        cell positionQueen(3, 0);
+        queen tempQueen(positionQueen);
+        playerQueen.push_back(tempQueen);
+        for(counter = 0 ; counter < 8 ; counter++) {
+            cell positionPawn(counter, 1);
+            pawn tempPawn(positionPawn);
+            playerPawns.push_back(tempPawn);
+        }
+        cell positionKing(4, 0);
+        king tempKing(positionKing);
         playerKing.push_back(tempKing);
     } else {
-        cout << "lanat";
+        cell positionRook1(0, 7);
+        rook tempRook1(positionRook1);
+        playerRooks.push_back(tempRook1);
+        cell positionRook2(7, 7);
+        rook tempRook2(positionRook2);
+        playerRooks.push_back(tempRook2);
+        cell positionBishop1(1, 7);
+        bishop tempBishop1(positionBishop1);
+        playerBishops.push_back(tempBishop1);
+        cell positionBishop2(6, 7);
+        bishop tempBishop2(positionBishop2);
+        playerBishops.push_back(tempBishop2);
+        cell positionknight1(2, 7);
+        knight tempKnight1(positionknight1);
+        playerKnights.push_back(tempKnight1);
+        cell positionknight2(5, 7);
+        knight tempKnight2(positionknight2);
+        playerKnights.push_back(tempKnight2);
+        cell positionQueen(3, 7);
+        queen tempQueen(positionQueen);
+        playerQueen.push_back(tempQueen);
+        for(counter = 0 ; counter < 8 ; counter++) {
+            cell positionPawn(counter, 6);
+            pawn tempPawn(positionPawn);
+            playerPawns.push_back(tempPawn);
+        }
         cell position(4, 7);
         king tempKing(position);
         playerKing.push_back(tempKing);
