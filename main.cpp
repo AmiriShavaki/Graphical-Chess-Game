@@ -1,6 +1,7 @@
 #include <iostream>
 #include <vector>
 #include <SDL.h>
+#include <string>
 
 using namespace std;
 
@@ -65,9 +66,23 @@ public:
     pawn(cell);
 };
 
+SDL_Window* window = NULL;
+SDL_Surface* screenSurface = NULL;
+
 king::king(cell givenCell) {
     isAlive = true;
     pos = givenCell;
+    SDL_Surface* kingSurface = NULL;
+    kingSurface = SDL_LoadBMP("king.bmp");
+    if (kingSurface == NULL) {cout<<"lanat";;}
+    kingSurface = SDL_ConvertSurface(kingSurface, screenSurface -> format, 0);
+    SDL_Rect position;
+    position.x = 120;
+    position.y = 120;
+    position.w = 50;
+    position.h = 50;
+    SDL_BlitScaled(kingSurface, NULL, screenSurface, &position);
+    SDL_UpdateWindowSurface(window);
 }
 
 queen::queen(cell givenCell) {
@@ -125,8 +140,6 @@ private:
     bool gameIsOver;
     playerColor turn;
     player white, black;
-    SDL_Window* window = NULL;
-    SDL_Surface* screenSurface = NULL;
     SDL_Surface* background = NULL;
 };
 
@@ -142,7 +155,10 @@ board::board() {
 void board::updateBoard() {
     SDL_BlitSurface(background, NULL, screenSurface, NULL);
     SDL_UpdateWindowSurface(window);
+    cell pos(10, 10);
+    king aDonkeyKing(pos);
 }
+
 bool board::isRunning() {
     return !gameIsOver;
 }
