@@ -2,6 +2,7 @@
 #include <vector>
 #include <SDL.h>
 #include <string>
+#include <map>
 
 using namespace std;
 
@@ -28,12 +29,15 @@ int cell::getY() {
     return y;
 }
 
+enum pieceType {King, Queen, Rook, Bishop, Knight, Pawn, None};
+
 class piece {
 public:
     cell getPos();
 protected:
     cell pos;
     bool isAlive;
+    pieceType type;
 };
 
 class king: public piece {
@@ -71,134 +75,46 @@ SDL_Surface* screenSurface = NULL;
 
 king::king(cell givenCell) {
     isAlive = true;
+    type = King;
     pos = givenCell;
-    SDL_Surface* kingSurface = NULL;
-    if (pos.getY() == 0) {
-        kingSurface = SDL_LoadBMP("pieces\\whiteGreenBackground\\king.bmp");
-    } else {
-        kingSurface = SDL_LoadBMP("pieces\\blackWhiteBackground\\king.bmp");
-    }
-    kingSurface = SDL_ConvertSurface(kingSurface, screenSurface -> format, 0);
-    SDL_Rect position;
-    position.x = pos.getX() * 50;
-    position.y = pos.getY() * 50;
-    position.w = 50;
-    position.h = 50;
-    SDL_BlitScaled(kingSurface, NULL, screenSurface, &position);
 
 }
 
 queen::queen(cell givenCell) {
     isAlive = true;
+    type = Queen;
     pos = givenCell;
-    SDL_Surface* queenSurface = NULL;
-    if (pos.getY() == 0 && pos.getX() == 3) {
-        queenSurface = SDL_LoadBMP("pieces\\whiteWhiteBackground\\queen.bmp");
-    } else if (pos.getY() == 7 && pos.getX() == 3) {
-        queenSurface = SDL_LoadBMP("pieces\\blackGreenBackground\\queen.bmp");
-    }
-    queenSurface = SDL_ConvertSurface(queenSurface , screenSurface -> format , 0);
-    SDL_Rect position;
-    position.x = pos.getX() * 50;
-    position.y = pos.getY() * 50;
-    position.w = 50;
-    position.h = 50;
-    SDL_BlitScaled(queenSurface, NULL, screenSurface, &position);
 }
 
 rook::rook(cell givenCell) {
     isAlive = true;
+    type = Rook;
     pos = givenCell;
-    SDL_Surface* rookSurface = NULL;
-    if (pos.getY() == 0 && pos.getX() == 7) {
-        rookSurface = SDL_LoadBMP("pieces\\whiteWhiteBackground\\rook.bmp");
-    } else if (pos.getY() == 0 && pos.getX() == 0) {
-        rookSurface = SDL_LoadBMP("pieces\\whiteGreenBackground\\rook.bmp");
-    } else if (pos.getX() == 0 && pos.getY() == 7) {
-        rookSurface = SDL_LoadBMP("pieces\\blackWhiteBackground\\rook.bmp");
-    }  else if (pos.getX() == 7 && pos.getY() == 7) {
-        rookSurface = SDL_LoadBMP("pieces\\blackGreenBackground\\rook.bmp");
-    }
-    rookSurface = SDL_ConvertSurface(rookSurface , screenSurface -> format , 0);
-    SDL_Rect position;
-    position.x = pos.getX() * 50;
-    position.y = pos.getY() * 50;
-    position.w = 50;
-    position.h = 50;
-    SDL_BlitScaled(rookSurface, NULL, screenSurface, &position);
 }
 
 bishop::bishop(cell givenCell) {
     isAlive = true;
+    type = Bishop;
     pos = givenCell;
-    SDL_Surface* bishopSurface = NULL;
-    if(pos.getX() == 1 && pos.getY() == 0) {
-        bishopSurface = SDL_LoadBMP("pieces\\whiteWhiteBackground\\bishop.bmp");
-    } else if(pos.getX() == 6 && pos.getY() == 0) {
-        bishopSurface = SDL_LoadBMP("pieces\\whiteGreenBackground\\bishop.bmp");
-    } else if(pos.getX() == 1 && pos.getY() == 7) {
-        bishopSurface = SDL_LoadBMP("pieces\\blackGreenBackground\\bishop.bmp");
-    } if(pos.getX() == 6 && pos.getY() == 7) {
-        bishopSurface = SDL_LoadBMP("pieces\\blackWhiteBackground\\bishop.bmp");
-    }
-    bishopSurface = SDL_ConvertSurface(bishopSurface , screenSurface -> format , 0);
-    SDL_Rect position;
-    position.x = pos.getX() * 50;
-    position.y = pos.getY() * 50;
-    position.w = 50;
-    position.h = 50;
-    SDL_BlitScaled(bishopSurface, NULL, screenSurface, &position);
 }
 
 knight::knight(cell givenCell) {
     isAlive = true;
+    type = Knight;
     pos = givenCell;
-    SDL_Surface* knightSurface = NULL;
-    if(pos.getX() == 5 && pos.getY() == 0) {
-        knightSurface = SDL_LoadBMP("pieces\\whiteWhiteBackground\\knight.bmp");
-    } else if(pos.getX() == 2 && pos.getY() == 0) {
-        knightSurface = SDL_LoadBMP("pieces\\whiteGreenBackground\\knight.bmp");
-    } else if(pos.getX() == 5 && pos.getY() == 7) {
-        knightSurface = SDL_LoadBMP("pieces\\blackGreenBackground\\knight.bmp");
-    } if(pos.getX() == 2 && pos.getY() == 7) {
-        knightSurface = SDL_LoadBMP("pieces\\blackWhiteBackground\\knight.bmp");
-    }
-    knightSurface = SDL_ConvertSurface(knightSurface , screenSurface -> format , 0);
-    SDL_Rect position;
-    position.x = pos.getX() * 50;
-    position.y = pos.getY() * 50;
-    position.w = 50;
-    position.h = 50;
-    SDL_BlitScaled(knightSurface, NULL, screenSurface, &position);
 }
 
 pawn::pawn(cell givenCell) {
     isAlive = true;
+    type = Pawn;
     pos = givenCell;
-    SDL_Surface* pawnSurface = NULL;
-    if(pos.getY() == 1 && pos.getX() % 2 == 0) {
-        pawnSurface = SDL_LoadBMP("pieces\\whiteWhiteBackground\\pawn.bmp");
-    } else if (pos.getY() == 1 && pos.getX() % 2 != 0) {
-        pawnSurface = SDL_LoadBMP("pieces\\whiteGreenBackground\\pawn.bmp");
-    } else if (pos.getY() == 6 && pos.getX() % 2 == 0) {
-        pawnSurface = SDL_LoadBMP("pieces\\blackGreenBackground\\pawn.bmp");
-    } else if (pos.getY() == 6 && pos.getX() % 2 != 0) {
-        pawnSurface = SDL_LoadBMP("pieces\\blackWhiteBackground\\pawn.bmp");
-    }
-    pawnSurface = SDL_ConvertSurface(pawnSurface , screenSurface -> format , 0);
-    SDL_Rect position;
-    position.x = pos.getX() * 50;
-    position.y = pos.getY() * 50;
-    position.h = 50;
-    position.w = 50;
-    SDL_BlitScaled(pawnSurface, NULL, screenSurface, &position);
 }
 
 cell piece::getPos() {
     return pos;
 }
 
-enum playerColor {White, Black};
+enum playerColor {White, Black, none};
 
 class player {
 public:
@@ -286,25 +202,64 @@ public:
     bool isChecked(player attacker, player deffender);
     bool isCheckmated(player attacker, player deffender);
     bool isStalemated(player attacker, player deffender);
+    void endGame();
+    pieceType pieceOf(cell);
+    void setTable(cell, pieceType);
+    void initializeTable();
+    void initializePieceMap();
+    void movePiece(cell starting, cell ending);
 private:
     bool gameIsOver;
     playerColor turn;
     SDL_Surface* background = NULL;
+    pieceType table[8][8];
+    playerColor colorTable[8][8];
+    int indexTable[8][8];
 };
 
 board::board() {
     window = SDL_CreateWindow("Chess", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 400, 400, SDL_WINDOW_SHOWN);
     screenSurface = SDL_GetWindowSurface(window);
     background = SDL_LoadBMP("background.bmp");
-    updateBoard();
+    initializePieceMap();
+    initializeTable();
+    player white(White), black(Black);
     gameIsOver = false;
     turn = White;
-    player white(White), black(Black);
-    SDL_UpdateWindowSurface(window);
 }
+
+map <pieceType, string> pieceMap;
 
 void board::updateBoard() {
     SDL_BlitSurface(background, NULL, screenSurface, NULL);
+    for (int i = 0; i < 8; i++) {
+        for (int j = 0; j < 8; j++) {
+            if (table[i][j] != None) {
+                string address = "pieces\\";
+                if (colorTable[i][j] == White) {
+                    address += "white";
+                } else {
+                    address += "black";
+                }
+                if ((i + j) % 2) {
+                    address += "WhiteBackground\\";
+                } else {
+                    address += "GreenBackground\\";
+                }
+                address += pieceMap[table[i][j]] + ".bmp";
+                SDL_Surface* pieceSurface = NULL;
+                pieceSurface = SDL_LoadBMP(address.data());
+                pieceSurface = SDL_ConvertSurface(pieceSurface , screenSurface -> format , 0);
+                SDL_Rect position;
+                position.x = j * 50;
+                position.y = i * 50;
+                position.h = 50;
+                position.w = 50;
+                SDL_BlitScaled(pieceSurface, NULL, screenSurface, &position);
+            }
+        }
+    }
+    SDL_UpdateWindowSurface(window);
 }
 
 bool board::isRunning() {
@@ -315,25 +270,104 @@ playerColor board::getTurn() {
     return turn;
 }
 
-int main(int argc, char* args[]) {
-    board game; //object of running gameTable
+void board::endGame() {
+    gameIsOver = true;
+}
 
-    while (game.isRunning()) { //mainLoop
-        while (game.getTurn() == White) {
-            /*while (!kbhit()) {
-                int firstClickX, secondClickX, firstClickY, secondClickY;
-                delay(100);
-            }*/
-            game.updateBoard();
-            SDL_Delay(1000);
-        }
-        while (game.getTurn() == Black) {
-            /*while (!kbhit()) {
-                int firstClickX, secondClickX, firstClickY, secondClickY;
-                delay(100);
-            }*/
-            game.updateBoard();
-            SDL_Delay(1000);
+pieceType board::pieceOf(cell position) {
+    return table[position.getY()][position.getX()];
+}
+
+void board::setTable(cell position, pieceType toAdd) {
+    table[position.getY()][position.getX()] = toAdd;
+}
+
+void board::initializeTable() {
+    pieceType tmp[8] = {Rook, Knight, Bishop, Queen, King, Bishop, Knight, Rook};
+    int tmp2[8] = {0, 0, 0, 0, 0, 1, 1, 1};
+    copy(tmp, tmp + 8, &table[0][0]);
+    copy(tmp, tmp + 8, &table[7][0]);
+    copy(tmp2, tmp2 + 8, &indexTable[0][0]);
+    copy(tmp2, tmp2 + 8, &indexTable[7][0]);
+    for (int i = 0; i < 8; i++) {
+        table[1][i] = Pawn;
+        table[6][i] = Pawn;
+        colorTable[0][i] = White;
+        colorTable[1][i] = White;
+        colorTable[6][i] = Black;
+        colorTable[7][i] = Black;
+        indexTable[1][i] = i;
+        indexTable[6][i] = i;
+    }
+    for (int i = 2; i < 6; i++) {
+        for (int j = 0; j < 8; j++) {
+            table[i][j] = None;
+            colorTable[i][j] = none;
+            indexTable[i][j] = -1;
         }
     }
+}
+
+void board::initializePieceMap() {
+    pieceMap[King] = "king";
+    pieceMap[Queen] = "queen";
+    pieceMap[Rook] = "rook";
+    pieceMap[Bishop] = "bishop";
+    pieceMap[Knight] = "knight";
+    pieceMap[Pawn] = "pawn";
+}
+
+void board::movePiece(cell starting, cell ending) {
+    int x = starting.getX(), y = starting.getY(), x2 = ending.getX(), y2 = ending.getY();
+    swap(table[y][x], table[y2][x2]);
+    swap(colorTable[y][x], colorTable[y2][x2]);
+    swap(indexTable[y][x], indexTable[y2][x2]);
+}
+
+int main(int argc, char* args[]) {
+    board game; //object of running gameTable
+    SDL_Event event;
+    bool firstClick = true;
+    int firstClickX, firstClickY;
+    while (game.isRunning()) { //mainLoop
+        while (game.getTurn() == White && game.isRunning()) {
+           while(SDL_PollEvent(&event) && game.getTurn() == White && game.isRunning()) {
+                switch(event.type) {
+                    case SDL_QUIT:
+                        game.endGame();
+                        break;
+                    case SDL_MOUSEBUTTONDOWN:
+                        if (firstClick) {
+                            firstClickX = event.motion.x / 50;
+                            firstClickY = event.motion.y / 50;
+                            firstClick = false;
+                        } else {
+                            /*should be checked if piece is able to do such a move
+                            and then no check or checkmate created against current player*/
+                            firstClick = true;
+                            cell starting(firstClickX, firstClickY), ending(event.motion.x / 50, event.motion.y / 50);
+                            game.movePiece(starting, ending);
+                        }
+                }
+                game.updateBoard();
+                SDL_Delay(100);
+            }
+        }
+        while (game.getTurn() == Black && game.isRunning()) {
+           while(SDL_PollEvent(&event) && game.getTurn() == Black && game.isRunning()) {
+                switch(event.type) {
+                    case SDL_QUIT:
+                        game.endGame();
+                        break;
+                    case SDL_MOUSEBUTTONDOWN: // if the event is mouse click
+                        cout << "Hey\n";
+                }
+            }
+        }
+    }
+    SDL_FreeSurface(screenSurface);
+    SDL_DestroyWindow(window);
+    window = NULL;
+    screenSurface = NULL;
+    SDL_Quit();
 }
