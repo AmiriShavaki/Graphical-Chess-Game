@@ -327,6 +327,7 @@ void board::movePiece(cell starting, cell ending) {
 int main(int argc, char* args[]) {
     board game; //object of running gameTable
     SDL_Event event;
+    int x , y;
     bool firstClick = true;
     int firstClickX, firstClickY;
     while (game.isRunning()) { //mainLoop
@@ -337,6 +338,7 @@ int main(int argc, char* args[]) {
                         game.endGame();
                         break;
                     case SDL_MOUSEBUTTONDOWN:
+                        SDL_GetMouseState( &x, &y );
                         if (firstClick) {
                             firstClickX = event.motion.x / 50;
                             firstClickY = event.motion.y / 50;
@@ -360,6 +362,7 @@ int main(int argc, char* args[]) {
                         game.endGame();
                         break;
                     case SDL_MOUSEBUTTONDOWN: // if the event is mouse click
+                        SDL_GetMouseState( &x, &y );
                         cout << "Hey\n";
                 }
             }
