@@ -196,7 +196,7 @@ player::player(playerColor color) {
 class board {
 public:
     board();
-    void updateBoard(int selectedY , int selectedX , bool firstClicking);
+    void updateBoard();
     bool isRunning();
     playerColor getTurn();
     bool isChecked(player attacker, player deffender);
@@ -208,7 +208,6 @@ public:
     void initializeTable();
     void initializePieceMap();
     void movePiece(cell starting, cell ending);
-    void selectedPieces(int selectedX , int selectedY);
 private:
     bool gameIsOver;
     playerColor turn;
@@ -231,7 +230,7 @@ board::board() {
 
 map <pieceType, string> pieceMap;
 
-void board::updateBoard(int selectedY , int selectedX ,bool firstClicking) {
+void board::updateBoard() {
     SDL_BlitSurface(background, NULL, screenSurface, NULL);
     for (int i = 0; i < 8; i++) {
         for (int j = 0; j < 8; j++) {
@@ -259,25 +258,6 @@ void board::updateBoard(int selectedY , int selectedX ,bool firstClicking) {
                 SDL_BlitScaled(pieceSurface, NULL, screenSurface, &position);
             }
         }
-    }
-    if(firstClicking == true) {
-        string selectedAddress = "pieces\\";
-    if(colorTable[selectedX][selectedY] == White) {
-        selectedAddress += "white";
-    } else {
-        selectedAddress += "black";
-    }
-    selectedAddress += "Selected\\";
-    selectedAddress += pieceMap[table[selectedX][selectedY]] + ".bmp";
-    SDL_Surface* selectedPieceSurface = NULL;
-    selectedPieceSurface = SDL_LoadBMP(selectedAddress.data());
-    selectedPieceSurface = SDL_ConvertSurface(selectedPieceSurface , screenSurface -> format , 0);
-    SDL_Rect position;
-    position.x = selectedY * 50;
-    position.y = selectedX * 50;
-    position.h = 50;
-    position.w = 50;
-    SDL_BlitScaled(selectedPieceSurface, NULL, screenSurface, &position);
     }
     SDL_UpdateWindowSurface(window);
 }
@@ -371,7 +351,7 @@ int main(int argc, char* args[]) {
                             game.movePiece(starting, ending);
                         }
                 }
-                game.updateBoard(firstClickX , firstClickY , true);
+                game.updateBoard();
                 SDL_Delay(100);
             }
         }
