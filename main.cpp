@@ -196,7 +196,7 @@ player::player(playerColor color) {
 class board {
 public:
     board();
-    void updateBoard();
+    void updateBoard(int selectedY , int selectedX , bool firstClicking);
     bool isRunning();
     playerColor getTurn();
     bool isChecked(player attacker, player deffender);
@@ -231,7 +231,7 @@ board::board() {
 
 map <pieceType, string> pieceMap;
 
-void board::updateBoard() {
+void board::updateBoard(int selectedY , int selectedX ,bool firstClicking) {
     SDL_BlitSurface(background, NULL, screenSurface, NULL);
     for (int i = 0; i < 8; i++) {
         for (int j = 0; j < 8; j++) {
@@ -259,6 +259,25 @@ void board::updateBoard() {
                 SDL_BlitScaled(pieceSurface, NULL, screenSurface, &position);
             }
         }
+    }
+    if(firstClicking == true) {
+        string selectedAddress = "pieces\\";
+    if(colorTable[selectedX][selectedY] == White) {
+        selectedAddress += "white";
+    } else {
+        selectedAddress += "black";
+    }
+    selectedAddress += "Selected\\";
+    selectedAddress += pieceMap[table[selectedX][selectedY]] + ".bmp";
+    SDL_Surface* selectedPieceSurface = NULL;
+    selectedPieceSurface = SDL_LoadBMP(selectedAddress.data());
+    selectedPieceSurface = SDL_ConvertSurface(selectedPieceSurface , screenSurface -> format , 0);
+    SDL_Rect position;
+    position.x = selectedY * 50;
+    position.y = selectedX * 50;
+    position.h = 50;
+    position.w = 50;
+    SDL_BlitScaled(selectedPieceSurface, NULL, screenSurface, &position);
     }
     SDL_UpdateWindowSurface(window);
 }
@@ -318,27 +337,6 @@ void board::initializePieceMap() {
     pieceMap[Pawn] = "pawn";
 }
 
-void board::selectedPieces(int selectedX , int selectedY) {
-    string selectedAddress = "pieces\\";
-    if(colorTable[selectedY][selectedX] == White) {
-        selectedAddress += "white";
-    } else {
-        selectedAddress += "black";
-    }
-    selectedAddress += "Selected\\";
-    selectedAddress += pieceMap[table[selectedY][selectedX]] + ".bmp";
-    SDL_Surface* selectedPieceSurface = NULL;
-    selectedPieceSurface = SDL_LoadBMP(selectedAddress.data());
-    selectedPieceSurface = SDL_ConvertSurface(selectedPieceSurface , screenSurface -> format , 0);
-    SDL_Rect position;
-    position.x = selectedY * 50;
-    position.y = selectedX * 50;
-    position.h = 50;
-    position.w = 50;
-    SDL_BlitScaled(selectedPieceSurface, NULL, screenSurface, &position);
-    SDL_UpdateWindowSurface(window);
-}
-
 void board::movePiece(cell starting, cell ending) {
     int x = starting.getX(), y = starting.getY(), x2 = ending.getX(), y2 = ending.getY();
     swap(table[y][x], table[y2][x2]);
@@ -364,8 +362,8 @@ int main(int argc, char* args[]) {
                             firstClickX = event.motion.x / 50;
                             firstClickY = event.motion.y / 50;
                             firstClick = false;
-                            game.selectedPieces(firstClickX , firstClickY);
-                        } else {
+                        }
+                         else {
                             /*should be checked if piece is able to do such a move
                             and then no check or checkmate created against current player*/
                             firstClick = true;
@@ -373,7 +371,7 @@ int main(int argc, char* args[]) {
                             game.movePiece(starting, ending);
                         }
                 }
-                game.updateBoard();
+                game.updateBoard(firstClickX , firstClickY , true);
                 SDL_Delay(100);
             }
         }
