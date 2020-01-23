@@ -30,6 +30,7 @@ int cell::getY() {
 }
 
 enum pieceType {King, Queen, Rook, Bishop, Knight, Pawn, None};
+enum playerColor {White, Black, none};
 
 class piece {
 public:
@@ -38,36 +39,47 @@ protected:
     cell pos;
     bool isAlive;
     pieceType type;
+    vector <cell> attacking;
 };
+
+cell piece::getPos() {
+    return pos;
+}
 
 class king: public piece {
 public:
     king(cell);
+    cell canGo();
 };
 
 class queen: public piece {
 public:
     queen(cell);
+    void canGo();
 };
 
 class rook: public piece {
 public:
     rook(cell);
+    void canGo();
 };
 
 class bishop: public piece {
 public:
     bishop(cell);
+    void canGo();
 };
 
 class knight: public piece {
 public:
     knight(cell);
+    void canGo();
 };
 
 class pawn: public piece {
 public:
     pawn(cell);
+    void canGo(playerColor);
 };
 
 SDL_Window* window = NULL;
@@ -80,10 +92,87 @@ king::king(cell givenCell) {
 
 }
 
+cell king::canGo() {
+    cell position = getPos();
+    int xPosition = position.getX();
+    int yPosition = position.getY();
+    if(xPosition + 1 <= 7) {
+        cell tmp(xPosition + 1 , yPosition);
+        attacking.push_back(tmp);
+    }
+    if(xPosition - 1 >= 0) {
+        cell tmp(xPosition - 1 , yPosition);
+        attacking.push_back(tmp);
+    }
+    if(yPosition + 1 <= 7) {
+        cell tmp(xPosition , yPosition + 1);
+        attacking.push_back(tmp);
+    }
+    if(yPosition - 1 >= 0) {
+        cell tmp(xPosition , yPosition - 1);
+        attacking.push_back(tmp);
+    }
+    if(xPosition + 1 <= 7 && yPosition + 1 <= 7) {
+        cell tmp(xPosition + 1 , yPosition + 1);
+        attacking.push_back(tmp);
+    }
+    if(xPosition - 1 >= 0 && yPosition - 1 >= 0) {
+        cell tmp(xPosition - 1 , yPosition - 1);
+        attacking.push_back(tmp);
+    }
+    if(xPosition + 1 <= 7 && yPosition - 1 >= 0) {
+        cell tmp(xPosition + 1 , yPosition - 1);
+        attacking.push_back(tmp);
+    }
+    if(xPosition - 1 >= 0 && yPosition + 1 <= 7) {
+        cell tmp(xPosition - 1 , yPosition + 1);
+        attacking.push_back(tmp);
+    }
+}
+
 queen::queen(cell givenCell) {
     isAlive = true;
     type = Queen;
     pos = givenCell;
+}
+
+void queen::canGo() {
+    cell position = getPos();
+    int xPosition = position.getX();
+    int yPosition = position.getY();
+    int counter;
+    for(counter = 0 ; xPosition + counter <= 7 && yPosition + counter <= 7 ; counter++) {
+        cell tmp(xPosition + counter , yPosition + counter);
+        attacking.push_back(tmp);
+    }
+    for(counter = 0 ; xPosition - counter >= 0 && yPosition - counter >= 0 ; counter++) {
+        cell tmp(xPosition - counter , yPosition - counter);
+        attacking.push_back(tmp);
+    }
+    for(counter = 0 ; xPosition - counter >= 0 && yPosition + counter <= 7 ; counter++) {
+        cell tmp(xPosition - counter , yPosition + counter);
+        attacking.push_back(tmp);
+    }
+    for(counter = 0 ; xPosition + counter <= 7 && yPosition - counter >= 0 ; counter++) {
+        cell tmp(xPosition + counter , yPosition - counter);
+        attacking.push_back(tmp);
+    }
+    for(counter = 1 ; counter + xPosition <= 7 ; counter++) {
+        cell tmp(counter + xPosition , yPosition);
+        attacking.push_back(tmp);
+    }
+    for(counter = 1 ; xPosition - counter >= 0 ; counter++) {
+        cell tmp(xPosition - counter , yPosition);
+        attacking.push_back(tmp);
+    }
+    for(counter = 1 ; counter + yPosition <= 7 ; counter++) {
+        cell tmp(xPosition , yPosition + counter);
+        attacking.push_back(tmp);
+    }
+    for(counter = 1 ; yPosition - counter >= 0 ; counter++) {
+        cell tmp(xPosition , yPosition - counter);
+        attacking.push_back(tmp);
+    }
 }
 
 rook::rook(cell givenCell) {
@@ -92,10 +181,57 @@ rook::rook(cell givenCell) {
     pos = givenCell;
 }
 
+void rook::canGo() {
+    cell position = getPos();
+    int xPosition = position.getX();
+    int yPosition = position.getY();
+    int counter;
+    for(counter = 1 ; counter + xPosition <= 7 ; counter++) {
+        cell tmp(counter + xPosition , yPosition);
+        attacking.push_back(tmp);
+    }
+    for(counter = 1 ; xPosition - counter >= 0 ; counter++) {
+        cell tmp(xPosition - counter , yPosition);
+        attacking.push_back(tmp);
+    }
+    for(counter = 1 ; counter + yPosition <= 7 ; counter++) {
+        cell tmp(xPosition , yPosition + counter);
+        attacking.push_back(tmp);
+    }
+    for(counter = 1 ; yPosition - counter >= 0 ; counter++) {
+        cell tmp(xPosition , yPosition - counter);
+        attacking.push_back(tmp);
+    }
+}
+
 bishop::bishop(cell givenCell) {
     isAlive = true;
     type = Bishop;
     pos = givenCell;
+
+}
+
+void bishop::canGo() {
+    cell position = getPos();
+    int xPosition = position.getX();
+    int yPosition = position.getY();
+    int counter;
+    for(counter = 0 ; xPosition + counter <= 7 && yPosition + counter <= 7 ; counter++) {
+        cell tmp(xPosition + counter , yPosition + counter);
+        attacking.push_back(tmp);
+    }
+    for(counter = 0 ; xPosition - counter >= 0 && yPosition - counter >= 0 ; counter++) {
+        cell tmp(xPosition - counter , yPosition - counter);
+        attacking.push_back(tmp);
+    }
+    for(counter = 0 ; xPosition - counter >= 0 && yPosition + counter <= 7 ; counter++) {
+        cell tmp(xPosition - counter , yPosition + counter);
+        attacking.push_back(tmp);
+    }
+    for(counter = 0 ; xPosition + counter <= 7 && yPosition - counter >= 0 ; counter++) {
+        cell tmp(xPosition + counter , yPosition - counter);
+        attacking.push_back(tmp);
+    }
 }
 
 knight::knight(cell givenCell) {
@@ -104,17 +240,74 @@ knight::knight(cell givenCell) {
     pos = givenCell;
 }
 
+void knight::canGo() {
+    cell position = getPos();
+    int xPosition = position.getX();
+    int yPosition = position.getY();
+    if(xPosition + 1 <= 7 && yPosition + 2 <= 7) {
+        cell tmp(xPosition + 1 , yPosition + 2);
+        attacking.push_back(tmp);
+    }
+    if(xPosition + 1 <= 7 && yPosition - 2 >= 0) {
+        cell tmp(xPosition + 1 , yPosition - 2);
+        attacking.push_back(tmp);
+    }
+    if(xPosition + 2 <= 7 && yPosition - 1 >= 0) {
+        cell tmp(xPosition + 2 , yPosition - 1);
+        attacking.push_back(tmp);
+    }
+    if(xPosition + 2 <= 7 && yPosition + 1 <= 7) {
+        cell tmp(xPosition + 2 , yPosition + 1);
+        attacking.push_back(tmp);
+    }
+    if(xPosition - 1 >= 0 && yPosition - 2 >= 0) {
+        cell tmp(xPosition - 1 , yPosition - 2);
+        attacking.push_back(tmp);
+    }
+    if(xPosition - 1 >= 0 && yPosition + 2 <= 7) {
+        cell tmp(xPosition - 1 , yPosition + 2);
+        attacking.push_back(tmp);
+    }
+    if(xPosition - 2 >= 0 && yPosition - 1 >= 0) {
+        cell tmp(xPosition - 2 , yPosition - 1);
+        attacking.push_back(tmp);
+    }
+    if(xPosition - 2 >= 0 && yPosition + 1 <= 7) {
+        cell tmp(xPosition - 2 , yPosition + 1);
+        attacking.push_back(tmp);
+    }
+}
+
 pawn::pawn(cell givenCell) {
     isAlive = true;
     type = Pawn;
     pos = givenCell;
 }
 
-cell piece::getPos() {
-    return pos;
+void pawn::canGo(playerColor color) {
+    cell position = getPos();
+    int xPosition = position.getX();
+    int yPosition = position.getY();
+    bool firstTurn = false;
+    if(color == White && yPosition == 1) {
+        firstTurn = true;
+    }
+    if(color == Black && yPosition == 6) {
+        firstTurn = true;
+    }
+    if(firstTurn) {
+       cell tmp1(xPosition , yPosition + 1);
+       attacking.push_back(tmp1);
+       cell tmp2(xPosition , yPosition + 2);
+       attacking.push_back(tmp2);
+       firstTurn = false;
+    } else {
+       if(yPosition + 1 <= 7) {
+        cell tmp(xPosition , yPosition + 1);
+        attacking.push_back(tmp);
+       }
+    }
 }
-
-enum playerColor {White, Black, none};
 
 class player {
 public:
@@ -206,7 +399,6 @@ public:
     pieceType pieceOf(cell);
     void setTable(cell, pieceType);
     pieceType getTable(cell);
-    playerColor getTableColor(cell);
     void initializeTable();
     void initializePieceMap();
     void movePiece(cell starting, cell ending);
@@ -232,7 +424,6 @@ board::board() {
 }
 
 map <pieceType, string> pieceMap;
-map <pieceType, vector <piece> > salam;
 
 void board::updateBoard(bool firstClick, int firstClickX, int firstClickY) {
     SDL_BlitSurface(background, NULL, screenSurface, NULL);
@@ -293,10 +484,6 @@ void board::setTable(cell position, pieceType toAdd) {
 
 pieceType board::getTable(cell position) {
     return table[position.getY()][position.getX()];
-}
-
-playerColor board::getTableColor(cell position) {
-    return colorTable[position.getY()][position.getX()];
 }
 
 void board::initializeTable() {
@@ -364,7 +551,7 @@ int main(int argc, char* args[]) {
                             firstClickX = event.motion.x / 50;
                             firstClickY = event.motion.y / 50;
                             firstClick = false;
-                        } else if (game.getTurn() != game.getTableColor(current)) {
+                        } else {
                             /*should be checked if piece is able to do such a move
                             and then no check or checkmate created against current player*/
                             firstClick = true;
