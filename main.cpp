@@ -205,6 +205,7 @@ public:
     void endGame();
     pieceType pieceOf(cell);
     void setTable(cell, pieceType);
+    pieceType getTable(cell);
     void initializeTable();
     void initializePieceMap();
     void movePiece(cell starting, cell ending);
@@ -288,6 +289,10 @@ void board::setTable(cell position, pieceType toAdd) {
     table[position.getY()][position.getX()] = toAdd;
 }
 
+pieceType board::getTable(cell position) {
+    return table[position.getY()][position.getX()];
+}
+
 void board::initializeTable() {
     pieceType tmp[8] = {Rook, Knight, Bishop, Queen, King, Bishop, Knight, Rook};
     int tmp2[8] = {0, 0, 0, 0, 0, 1, 1, 1};
@@ -328,6 +333,10 @@ void board::movePiece(cell starting, cell ending) {
     swap(table[y][x], table[y2][x2]);
     swap(colorTable[y][x], colorTable[y2][x2]);
     swap(indexTable[y][x], indexTable[y2][x2]);
+    if (table[y][x] != None) {
+        table[y][x] = None;
+        colorTable[y][x] = none;
+    }
 }
 
 int main(int argc, char* args[]) {
@@ -344,7 +353,8 @@ int main(int argc, char* args[]) {
                         game.endGame();
                         break;
                     case SDL_MOUSEBUTTONDOWN:
-                        if (firstClick) {
+                        cell current(event.motion.x / 50, event.motion.y / 50);
+                        if (firstClick && game.getTable(current) != None) {
                             firstClickX = event.motion.x / 50;
                             firstClickY = event.motion.y / 50;
                             firstClick = false;
