@@ -206,6 +206,7 @@ public:
     pieceType pieceOf(cell);
     void setTable(cell, pieceType);
     pieceType getTable(cell);
+    playerColor getTableColor(cell);
     void initializeTable();
     void initializePieceMap();
     void movePiece(cell starting, cell ending);
@@ -231,6 +232,7 @@ board::board() {
 }
 
 map <pieceType, string> pieceMap;
+map <pieceType, vector <piece> > salam;
 
 void board::updateBoard(bool firstClick, int firstClickX, int firstClickY) {
     SDL_BlitSurface(background, NULL, screenSurface, NULL);
@@ -291,6 +293,10 @@ void board::setTable(cell position, pieceType toAdd) {
 
 pieceType board::getTable(cell position) {
     return table[position.getY()][position.getX()];
+}
+
+playerColor board::getTableColor(cell position) {
+    return colorTable[position.getY()][position.getX()];
 }
 
 void board::initializeTable() {
@@ -358,7 +364,7 @@ int main(int argc, char* args[]) {
                             firstClickX = event.motion.x / 50;
                             firstClickY = event.motion.y / 50;
                             firstClick = false;
-                        } else {
+                        } else if (game.getTurn() != game.getTableColor(current)) {
                             /*should be checked if piece is able to do such a move
                             and then no check or checkmate created against current player*/
                             firstClick = true;
