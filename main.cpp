@@ -676,9 +676,9 @@ private:
 };
 
 board::board() : white(White), black(Black) {
-    window = SDL_CreateWindow("Chess", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 400, 400, SDL_WINDOW_SHOWN);
+    window = SDL_CreateWindow("Chess", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 400, 450, SDL_WINDOW_SHOWN);
     screenSurface = SDL_GetWindowSurface(window);
-    background = SDL_LoadBMP("background.bmp");
+    background = SDL_LoadBMP("pictures\\backgrounds\\turnWhite.bmp");
     initializePieceMap();
     initializeTable();
     gameIsOver = false;
@@ -695,7 +695,7 @@ void board::updateAttackingCellGraphics(playerColor attacker, pieceType type, in
         for (int i = 0; i < getPlayer(attacker) -> getPawns()[index] -> canGo(attacker, colorTable).size(); i++) {
             cell toRed = getPlayer(attacker) -> getPawns()[index] -> canGo(attacker, colorTable)[i];
             SDL_Surface* pieceSurface = NULL;
-            string address = "pieces\\";
+            string address = "pictures\\pieces\\";
             if (colorTable[toRed.getY()][toRed.getX()] == White) {
                 address += "whiteAttacked\\";
             } else {
@@ -723,7 +723,7 @@ void board::updateAttackingCellGraphics(playerColor attacker, pieceType type, in
         for (int i = 0; i < getPlayer(attacker) -> getKing()[index] -> canGo(attacker, colorTable).size(); i++) {
             cell toRed = getPlayer(attacker) -> getKing()[index] -> canGo(attacker, colorTable)[i];
             SDL_Surface* pieceSurface = NULL;
-            string address = "pieces\\";
+            string address = "pictures\\pieces\\";
             if (colorTable[toRed.getY()][toRed.getX()] == White) {
                 address += "whiteAttacked\\";
             } else {
@@ -751,7 +751,7 @@ void board::updateAttackingCellGraphics(playerColor attacker, pieceType type, in
         for (int i = 0; i < getPlayer(attacker) -> getRooks()[index] -> canGo(attacker, colorTable).size(); i++) {
             cell toRed = getPlayer(attacker) -> getRooks()[index] -> canGo(attacker, colorTable)[i];
             SDL_Surface* pieceSurface = NULL;
-            string address = "pieces\\";
+            string address = "pictures\\pieces\\";
             if (colorTable[toRed.getY()][toRed.getX()] == White) {
                 address += "whiteAttacked\\";
             } else {
@@ -779,7 +779,7 @@ void board::updateAttackingCellGraphics(playerColor attacker, pieceType type, in
         for (int i = 0; i < getPlayer(attacker) -> getBishops()[index] -> canGo(attacker, colorTable).size(); i++) {
             cell toRed = getPlayer(attacker) -> getBishops()[index] -> canGo(attacker, colorTable)[i];
             SDL_Surface* pieceSurface = NULL;
-            string address = "pieces\\";
+            string address = "pictures\\pieces\\";
             if (colorTable[toRed.getY()][toRed.getX()] == White) {
                 address += "whiteAttacked\\";
             } else {
@@ -807,7 +807,7 @@ void board::updateAttackingCellGraphics(playerColor attacker, pieceType type, in
         for (int i = 0; i < getPlayer(attacker) -> getKnights()[index] -> canGo(attacker, colorTable).size(); i++) {
             cell toRed = getPlayer(attacker) -> getKnights()[index] -> canGo(attacker, colorTable)[i];
             SDL_Surface* pieceSurface = NULL;
-            string address = "pieces\\";
+            string address = "pictures\\pieces\\";
             if (colorTable[toRed.getY()][toRed.getX()] == White) {
                 address += "whiteAttacked\\";
             } else {
@@ -835,7 +835,7 @@ void board::updateAttackingCellGraphics(playerColor attacker, pieceType type, in
         for (int i = 0; i < getPlayer(attacker) -> getQueen()[index] -> canGo(attacker, colorTable).size(); i++) {
             cell toRed = getPlayer(attacker) -> getQueen()[index] -> canGo(attacker, colorTable)[i];
             SDL_Surface* pieceSurface = NULL;
-            string address = "pieces\\";
+            string address = "pictures\\pieces\\";
             if (colorTable[toRed.getY()][toRed.getX()] == White) {
                 address += "whiteAttacked\\";
             } else {
@@ -871,7 +871,7 @@ void board::updateBoard(bool firstClick, int firstClickX, int firstClickY) {
     for (int i = 0; i < 8; i++) {
         for (int j = 0; j < 8; j++) {
             if (table[i][j] != None) {
-                string address = "pieces\\";
+                string address = "pictures\\pieces\\";
                 if (colorTable[i][j] == White) {
                     if (dangerForWhite[i][j]) {
                         continue;
@@ -1076,6 +1076,11 @@ player* board::getPlayer(playerColor color) {
 
 void board::nextTurn() {
     turn = rivalMap[turn];
+    if (turn == White) {
+        background = SDL_LoadBMP("pictures\\backgrounds\\turnWhite.bmp");
+    } else {
+        background = SDL_LoadBMP("pictures\\backgrounds\\turnBlack.bmp");
+    }
 }
 
 int main(int argc, char* args[]) {
