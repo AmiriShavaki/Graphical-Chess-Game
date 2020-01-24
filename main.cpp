@@ -1013,6 +1013,9 @@ bool board::movePiece(cell starting, cell ending) {
     if (!isValidMove) {
         return false;
     }
+    if(table[y2][x2] == King){
+     return false;
+    }
     swap(table[y][x], table[y2][x2]);
     swap(colorTable[y][x], colorTable[y2][x2]);
     swap(indexTable[y][x], indexTable[y2][x2]);
