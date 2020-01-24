@@ -182,37 +182,93 @@ vector <cell> queen::canGo(playerColor color, playerColor colorTable[8][8]) {
     int xPosition = position.getX();
     int yPosition = position.getY();
     int counter;
-    for(counter = 0 ; xPosition + counter <= 7 && yPosition + counter <= 7 ; counter++) {
+    for(counter = 1 ; xPosition + counter <= 7 && yPosition + counter <= 7 ; counter++) {
         cell tmp(xPosition + counter , yPosition + counter);
-        attacking.push_back(tmp);
+        if (colorTable[tmp.getY()][tmp.getX()] == none) {
+            attacking.push_back(tmp);
+        } else if (colorTable[tmp.getY()][tmp.getX()] != color) {
+            attacking.push_back(tmp);
+            break;
+        } else if (colorTable[tmp.getY()][tmp.getX()] == color) {
+            break;
+        }
     }
-    for(counter = 0 ; xPosition - counter >= 0 && yPosition - counter >= 0 ; counter++) {
+    for(counter = 1 ; xPosition - counter >= 0 && yPosition - counter >= 0 ; counter++) {
         cell tmp(xPosition - counter , yPosition - counter);
-        attacking.push_back(tmp);
+        if (colorTable[tmp.getY()][tmp.getX()] == none) {
+            attacking.push_back(tmp);
+        } else if (colorTable[tmp.getY()][tmp.getX()] != color) {
+            attacking.push_back(tmp);
+            break;
+        } else if (colorTable[tmp.getY()][tmp.getX()] == color) {
+            break;
+        }
     }
-    for(counter = 0 ; xPosition - counter >= 0 && yPosition + counter <= 7 ; counter++) {
+    for(counter = 1 ; xPosition - counter >= 0 && yPosition + counter <= 7 ; counter++) {
         cell tmp(xPosition - counter , yPosition + counter);
-        attacking.push_back(tmp);
+        if (colorTable[tmp.getY()][tmp.getX()] == none) {
+            attacking.push_back(tmp);
+        } else if (colorTable[tmp.getY()][tmp.getX()] != color) {
+            attacking.push_back(tmp);
+            break;
+        } else if (colorTable[tmp.getY()][tmp.getX()] == color) {
+            break;
+        }
     }
-    for(counter = 0 ; xPosition + counter <= 7 && yPosition - counter >= 0 ; counter++) {
+    for(counter = 1 ; xPosition + counter <= 7 && yPosition - counter >= 0 ; counter++) {
         cell tmp(xPosition + counter , yPosition - counter);
-        attacking.push_back(tmp);
+        if (colorTable[tmp.getY()][tmp.getX()] == none) {
+            attacking.push_back(tmp);
+        } else if (colorTable[tmp.getY()][tmp.getX()] != color) {
+            attacking.push_back(tmp);
+            break;
+        } else if (colorTable[tmp.getY()][tmp.getX()] == color) {
+            break;
+        }
     }
     for(counter = 1 ; counter + xPosition <= 7 ; counter++) {
         cell tmp(counter + xPosition , yPosition);
-        attacking.push_back(tmp);
+        if (colorTable[tmp.getY()][tmp.getX()] == none) {
+            attacking.push_back(tmp);
+        } else if (colorTable[tmp.getY()][tmp.getX()] != color) {
+            attacking.push_back(tmp);
+            break;
+        } else if (colorTable[tmp.getY()][tmp.getX()] == color) {
+            break;
+        }
     }
     for(counter = 1 ; xPosition - counter >= 0 ; counter++) {
         cell tmp(xPosition - counter , yPosition);
-        attacking.push_back(tmp);
+        if (colorTable[tmp.getY()][tmp.getX()] == none) {
+            attacking.push_back(tmp);
+        } else if (colorTable[tmp.getY()][tmp.getX()] != color) {
+            attacking.push_back(tmp);
+            break;
+        } else if (colorTable[tmp.getY()][tmp.getX()] == color) {
+            break;
+        }
     }
     for(counter = 1 ; counter + yPosition <= 7 ; counter++) {
         cell tmp(xPosition , yPosition + counter);
-        attacking.push_back(tmp);
+        if (colorTable[tmp.getY()][tmp.getX()] == none) {
+            attacking.push_back(tmp);
+        } else if (colorTable[tmp.getY()][tmp.getX()] != color) {
+            attacking.push_back(tmp);
+            break;
+        } else if (colorTable[tmp.getY()][tmp.getX()] == color) {
+            break;
+        }
     }
     for(counter = 1 ; yPosition - counter >= 0 ; counter++) {
         cell tmp(xPosition , yPosition - counter);
-        attacking.push_back(tmp);
+        if (colorTable[tmp.getY()][tmp.getX()] == none) {
+            attacking.push_back(tmp);
+        } else if (colorTable[tmp.getY()][tmp.getX()] != color) {
+            attacking.push_back(tmp);
+            break;
+        } else if (colorTable[tmp.getY()][tmp.getX()] == color) {
+            break;
+        }
     }
     return attacking;
 }
@@ -774,6 +830,34 @@ void board::updateAttackingCellGraphics(playerColor attacker, pieceType type, in
             }
         }
     }
+    if (type == Queen) {
+        cout << "kiiiing" << getPlayer(attacker) -> getQueen()[index]->getPos().getY() << endl;
+        for (int i = 0; i < getPlayer(attacker) -> getQueen()[index] -> canGo(attacker, colorTable).size(); i++) {
+            cell toRed = getPlayer(attacker) -> getQueen()[index] -> canGo(attacker, colorTable)[i];
+            SDL_Surface* pieceSurface = NULL;
+            string address = "pieces\\";
+            if (colorTable[toRed.getY()][toRed.getX()] == White) {
+                address += "whiteAttacked\\";
+            } else {
+                address += "blackAttacked\\";
+            }
+            address += pieceMap[table[toRed.getY()][toRed.getX()]] + ".bmp";
+            pieceSurface = SDL_LoadBMP(address.data());
+            pieceSurface = SDL_ConvertSurface(pieceSurface , screenSurface -> format , 0);
+            SDL_Rect position;
+            position.x = toRed.getX() * 50;
+            position.y = toRed.getY() * 50;
+            position.h = 50;
+            position.w = 50;
+            SDL_BlitScaled(pieceSurface, NULL, screenSurface, &position);
+            if (attacker == White) {
+                dangerForBlack[toRed.getY()][toRed.getX()] = true;
+            }
+            if (attacker == Black) {
+                dangerForWhite[toRed.getY()][toRed.getX()] = true;
+            }
+        }
+    }
 }
 
 map <playerColor, player> playerMap;
@@ -917,6 +1001,9 @@ bool board::movePiece(cell starting, cell ending) {
     if (table[y][x] == Knight) {
         validMoves = getPlayer(color) -> getKnights()[index] -> canGo(getPlayer(color) -> getColor(), colorTable);
     }
+    if (table[y][x] == Queen) {
+        validMoves = getPlayer(color) -> getQueen()[index] -> canGo(getPlayer(color) -> getColor(), colorTable);
+    }
     for (int i = 0; i < validMoves.size(); i++) {
         cell cur = validMoves[i];
         if (cur.getX() == x2 && cur.getY() == y2) {
@@ -957,6 +1044,11 @@ bool board::movePiece(cell starting, cell ending) {
         cell toSet(x2, y2);
         getPlayer(colorTable[y2][x2]) -> getKnights()[indexTable[y2][x2]] -> setPos(toSet);
         cout << getPlayer(colorTable[y2][x2]) -> getKnights()[indexTable[y2][x2]] -> getPos().getY() << endl;
+    }
+    if (table[y2][x2] == Queen) {
+        cell toSet(x2, y2);
+        getPlayer(colorTable[y2][x2]) -> getQueen()[indexTable[y2][x2]] -> setPos(toSet);
+        cout << getPlayer(colorTable[y2][x2]) -> getQueen()[indexTable[y2][x2]] -> getPos().getY() << endl;
     }
     return true;
 }
