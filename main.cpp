@@ -436,8 +436,6 @@ vector <cell> pawn::canGo(playerColor color, playerColor colorTable[8][8]) {
             attacking.push_back(tmp);
         }
     }
-    rivalMap[White] = Black;
-    rivalMap[Black] = White;
     if (yPosition + (color == White ? 1 : -1) <= 7 && yPosition + (color == White ? 1 : -1) >= 0 && xPosition + 1 <= 7 &&
         colorTable[yPosition + (color == White ? 1 : -1)][xPosition + 1] == rivalMap[color]) {
         cell tmp(xPosition + 1, yPosition + (color == White ? 1 : -1));
@@ -634,6 +632,8 @@ board::board() : white(White), black(Black) {
 map <pieceType, string> pieceMap;
 
 void board::updateAttackingCellGraphics(playerColor attacker, pieceType type, int index){
+    rivalMap[White] = Black;
+    rivalMap[Black] = White;
     if (type == Pawn) {
         cout << "vaaaaaay" << getPlayer(attacker) -> getPawns()[index]->getPos().getY() << endl;
         for (int i = 0; i < getPlayer(attacker) -> getPawns()[index] -> canGo(attacker, colorTable).size(); i++) {
@@ -1013,8 +1013,9 @@ int main(int argc, char* args[]) {
                             firstClick = true;
                             cell starting(firstClickX, firstClickY), ending(event.motion.x / 50, event.motion.y / 50);
                             if (game.movePiece(starting, ending)) {
-                                    cout << "PPPPPPPPPPPPPPPPPPPPPPPPPPPPP\n";
+                                    cout << "biaaaaaaaaaaaaaaaaaaa" << game.getTurn() << endl;
                                 game.nextTurn();
+                                cout << "biaaaaaaaaaaaaaaaaaaa" << game.getTurn() << endl;
                             }
                             game.printBoard();
                             cout << endl;
