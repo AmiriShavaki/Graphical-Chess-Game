@@ -818,12 +818,12 @@ playerColor player::getColor() {
 class board {
 public:
     board();
-    void updateBoard(bool, int, int);
+    void updateBoard(bool, int, int, bool, bool, bool, bool);
     bool isRunning();
     playerColor getTurn();
     bool isChecked(king* defenderKing, playerColor color);
-    bool isCheckmated(king* defenderKing);
-    bool isStalemated(king* defenderKing);
+    bool isCheckmated(king* defenderKing, playerColor color);
+    bool isStalemated(king* defenderKing, playerColor color);
     void endGame();
     pieceType pieceOf(cell);
     void setTable(cell, pieceType);
@@ -1036,12 +1036,44 @@ void board::updateAttackingCellGraphics(playerColor attacker, pieceType type, in
 
 map <playerColor, player> playerMap;
 
-void board::updateBoard(bool firstClick, int firstClickX, int firstClickY) {
+void board::updateBoard(bool firstClick, int firstClickX, int firstClickY, bool checkWhite, bool checkBlack,
+                        bool checkmateWhite, bool checkmateBlack) {
     for (int i = 0; i < 8; i++) {
         fill(dangerForBlack[i], dangerForBlack[i] + 8, false);
         fill(dangerForWhite[i], dangerForWhite[i] + 8, false);
     }
+    if (checkmateWhite) {
+        background = SDL_LoadBMP("pictures\\backgrounds\\WinnerIsBlack.bmp");
+    }
+    if (checkmateBlack) {
+        background = SDL_LoadBMP("pictures\\backgrounds\\WinnerIsWhite.bmp");
+    }
+    if (checkmateBlack || checkmateWhite) {
+        gameIsOver = true;
+    }
     SDL_BlitSurface(background, NULL, screenSurface, NULL);
+    if (checkWhite) {
+        SDL_Surface* pieceSurface = NULL;
+        pieceSurface = SDL_LoadBMP("pictures\\checkMessages\\whiteCheck.bmp");
+        pieceSurface = SDL_ConvertSurface(pieceSurface , screenSurface -> format , 0);
+        SDL_Rect position;
+        position.x = 0;
+        position.y = 450;
+        position.h = 50;
+        position.w = 400;
+        SDL_BlitScaled(pieceSurface, NULL, screenSurface, &position);
+    }
+    if (checkBlack) {
+        SDL_Surface* pieceSurface = NULL;
+        pieceSurface = SDL_LoadBMP("pictures\\checkMessages\\blackCheck.bmp");
+        pieceSurface = SDL_ConvertSurface(pieceSurface , screenSurface -> format , 0);
+        SDL_Rect position;
+        position.x = 0;
+        position.y = 450;
+        position.h = 50;
+        position.w = 400;
+        SDL_BlitScaled(pieceSurface, NULL, screenSurface, &position);
+    }
     for (int i = 0; i < 8; i++) {
         for (int j = 0; j < 8; j++) {
             if (table[i][j] != None) {
@@ -1297,6 +1329,22 @@ bool board::isChecked(king* defenderKing, playerColor color) {
     //return defenderKing -> canGo(getColorTable(defenderKing -> getPos()), colorTable).size() == 0;
 }
 
+bool board::isCheckmated(king* defenderKing, playerColor color) {
+    if (!isChecked(defenderKing, color)) {
+        return false;
+    }
+    for (int i = 0; i < defenderKing -> canGo(getColorTable(defenderKing -> getPos()), colorTable).size(); i++) {
+        cell curMove = defenderKing -> canGo(getColorTable(defenderKing -> getPos()), colorTable)[i];
+        if (color == White && !dangerousForWhite[curMove.getY()][curMove.getX()]) {
+            return false;
+        }
+        if (color == Black && !dangerousForBlack[curMove.getY()][curMove.getX()]) {
+            return false;
+        }
+    }
+    return true;
+}
+
 int main(int argc, char* args[]) {
     board game; //object of running gameTable
     //game.printBoard();
@@ -1306,10 +1354,16 @@ int main(int argc, char* args[]) {
     bool firstClick = true;
     int firstClickX = -1, firstClickY = -1;
     while (game.isRunning()) { //mainLoop
+        bool checkWhite = false, checkBlack = false, checkmateWhite = false, checkmateBlack = false;
         while (game.getTurn() == White && game.isRunning()) {
            while(SDL_PollEvent(&event) && game.getTurn() == White && game.isRunning()) {
                 if (game.isChecked(game.getPlayer(White) -> getKing()[0], White)) {
                     cout << "CheckkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkWhiteeeeeeeeee\n";
+                    checkWhite = true;
+                }
+                if (game.isCheckmated(game.getPlayer(White) -> getKing()[0], White)) {
+                    cout << "CheckkkkkkkkkkkmatttttttttttttttteWhiteeeeeeeeee\n";
+                    checkmateWhite = true;
                 }
                 switch(event.type) {
                     case SDL_QUIT:
@@ -1335,7 +1389,7 @@ int main(int argc, char* args[]) {
                         }
                         //cout << "biaaaaaaaaaaaaaaaaaaa" << game.getTurn() << endl;
                 }
-                game.updateBoard(firstClick, firstClickX, firstClickY);
+                game.updateBoard(firstClick, firstClickX, firstClickY, checkWhite, checkBlack, checkmateWhite, checkmateBlack);
                 SDL_Delay(100);
             }
         }
@@ -1344,6 +1398,11 @@ int main(int argc, char* args[]) {
            while(SDL_PollEvent(&event) && game.getTurn() == Black && game.isRunning()) {
                 if (game.isChecked(game.getPlayer(Black) -> getKing()[0], Black)) {
                     cout << "CheckkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkBlackkkkkkkkkk\n";
+                    checkBlack = true;
+                }
+                if (game.isCheckmated(game.getPlayer(Black) -> getKing()[0], Black)) {
+                    cout << "CheckkkkkkkkkkkmatttttttttttttttteBlackkkkkkkkkkk\n";
+                    checkmateBlack = true;
                 }
                 switch(event.type) {
                     case SDL_QUIT:
@@ -1369,11 +1428,12 @@ int main(int argc, char* args[]) {
                         }
                         //cout << "biaa" << game.getTurn() << ' ' << game.getColorTable(current) << endl;
                 }
-                game.updateBoard(firstClick, firstClickX, firstClickY);
+                game.updateBoard(firstClick, firstClickX, firstClickY, checkWhite, checkBlack, checkmateWhite, checkmateBlack);
                 SDL_Delay(100);
             }
         }
     }
+    SDL_Delay(1000);
     SDL_FreeSurface(screenSurface);
     SDL_DestroyWindow(window);
     window = NULL;
