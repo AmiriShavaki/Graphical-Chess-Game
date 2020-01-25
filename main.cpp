@@ -818,6 +818,7 @@ playerColor player::getColor() {
 class board {
 public:
     board();
+    void fillDangerous(player*);
     void updateBoard(bool, int, int, bool, bool, bool, bool);
     bool isRunning();
     playerColor getTurn();
@@ -832,7 +833,7 @@ public:
     int getIndexTable(cell);
     void initializeTable();
     void initializePieceMap();
-    bool movePiece(cell starting, cell ending);
+    bool movePiece(cell starting, cell ending, bool flg);
     void updateAttackingCellGraphics(playerColor attacker, pieceType type, int index);
     void printBoard();
     player* getPlayer(playerColor);
@@ -1142,8 +1143,8 @@ void board::updateBoard(bool firstClick, int firstClickX, int firstClickY, bool 
         }
         color = Black;
     }
-    printBoard();
-    cout << endl;
+    //printBoard();
+    //cout << endl;
 }
 
 bool board::isRunning() {
@@ -1214,7 +1215,7 @@ void board::initializePieceMap() {
     pieceMap[None] = "none";
 }
 
-bool board::movePiece(cell starting, cell ending) {
+bool board::movePiece(cell starting, cell ending, bool flg) {
     int x = starting.getX(), y = starting.getY(), x2 = ending.getX(), y2 = ending.getY();
     bool isValidMove = false;
     vector <cell> validMoves;
@@ -1244,13 +1245,15 @@ bool board::movePiece(cell starting, cell ending) {
             isValidMove = true;
         }
     }
-    if (!isValidMove || table[y2][x2] == King) {
+    if (!flg && (!isValidMove || table[y2][x2] == King)) {
         return false;
     }
+    cout << table[y][x] << ' ' << table[y2][x2] << endl;
     swap(table[y][x], table[y2][x2]);
     swap(colorTable[y][x], colorTable[y2][x2]);
     swap(indexTable[y][x], indexTable[y2][x2]);
-    if (table[y][x] != None) {
+    cout << table[y][x] << ' ' << table[y2][x2] << endl;
+    if (table[y][x] != None && !flg) {
         table[y][x] = None;
         colorTable[y][x] = none;
     }
@@ -1342,7 +1345,61 @@ bool board::isCheckmated(king* defenderKing, playerColor color) {
             return false;
         }
     }
-    return true;
+    bool flg = true;
+    for (int j = 0; j < 8 ; j++) {
+        for (int i = 0; i < getPlayer(color) -> getPawns()[j] -> canGo(color, colorTable).size(); i++) {
+            int x1 , y1 , x2 , y2;
+            x1 = getPlayer(color) -> getPawns()[j] -> getPos().getX();
+            y1 = getPlayer(color) -> getPawns()[j] -> getPos().getY();
+            x2 = getPlayer(color) -> getPawns()[j] -> canGo(color, colorTable)[i].getX();
+            y2 = getPlayer(color) -> getPawns()[j] -> canGo(color, colorTable)[i].getY();
+            cell starting(x1, y1), ending(x2, y2);
+            movePiece(starting, ending, true);
+            cout << i << endl;
+            if (color == White) {
+                fillDangerous(&black);
+            }
+            if (color == Black) {
+                fillDangerous(&white);
+            }
+            //printBoard();
+            cout << endl;
+            if(!isChecked(defenderKing, color)) {
+                flg = false;
+            }
+            movePiece(ending, starting, true);
+        }
+    }
+    return flg;
+}
+
+void board::fillDangerous(player* attacker) {
+        for (int i = 0; i < 8; i++) {
+            fill(dangerousForBlack[i], dangerousForBlack[i] + 8, false);
+            fill(dangerousForWhite[i], dangerousForWhite[i] + 8, false);
+        }
+        //printBoard();
+        //cout << "Heeeeeeeeeeeeeeeeeeeeeeeeey\n";
+        for (int i = 0; i < 8; i++) {
+            attacker -> getPawns()[i] -> canGo(attacker -> getColor(), colorTable);
+            //printBoard();
+            //cout << endl;
+        }
+        for (int i = 0; i < 1; i++) {
+            attacker -> getKing()[i] -> canGo(attacker -> getColor(), colorTable);
+        }
+        for (int i = 0; i < 1; i++) {
+            attacker -> getQueen()[i] -> canGo(attacker -> getColor(), colorTable);
+        }
+        for (int i = 0; i < 2; i++) {
+            attacker -> getKnights()[i] -> canGo(attacker -> getColor(), colorTable);
+        }
+        for (int i = 0; i < 2; i++) {
+            attacker -> getBishops()[i] -> canGo(attacker -> getColor(), colorTable);
+        }
+        for (int i = 0; i < 2; i++) {
+            attacker -> getRooks()[i] -> canGo(attacker -> getColor(), colorTable);
+        }
 }
 
 int main(int argc, char* args[]) {
@@ -1379,7 +1436,7 @@ int main(int argc, char* args[]) {
                             //should be no check or checkmate created against current player
                             firstClick = true;
                             cell starting(firstClickX, firstClickY), ending(event.motion.x / 50, event.motion.y / 50);
-                            if (game.movePiece(starting, ending)) {
+                            if (game.movePiece(starting, ending, false)) {
                                     //cout << "biaaaaaaaaaaaaaaaaaaa" << game.getTurn() << endl;
                                 game.nextTurn();
                                 //cout << "biaaaaaaaaaaaaaaaaaaa" << game.getTurn() << endl;
@@ -1420,7 +1477,7 @@ int main(int argc, char* args[]) {
                             and then no check or checkmate created against current player*/
                             firstClick = true;
                             cell starting(firstClickX, firstClickY), ending(event.motion.x / 50, event.motion.y / 50);
-                            if (game.movePiece(starting, ending)) {
+                            if (game.movePiece(starting, ending, false)) {
                                 game.nextTurn();
                             }
                             //game.printBoard();
@@ -1433,7 +1490,7 @@ int main(int argc, char* args[]) {
             }
         }
     }
-    SDL_Delay(1000);
+    SDL_Delay(70000);
     SDL_FreeSurface(screenSurface);
     SDL_DestroyWindow(window);
     window = NULL;
