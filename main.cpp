@@ -47,6 +47,9 @@ public:
     cell getPos();
     void setPos(cell toSet);
     vector <cell> getAttacking();
+    void killIt();
+    void respawnIt();
+    bool isOnBoard();
 protected:
     cell pos;
     bool isAlive;
@@ -66,6 +69,18 @@ void piece::setPos(cell toSet) {
 
 vector <cell> piece::getAttacking() {
     return attacking;
+}
+
+void piece::killIt() {
+    isAlive = false;
+}
+
+void piece::respawnIt() {
+    isAlive = true;
+}
+
+bool piece::isOnBoard() {
+    return isAlive;
 }
 
 class king: public piece {
@@ -117,6 +132,9 @@ king::king(cell givenCell) {
 
 vector <cell> king::canGo(playerColor color, playerColor colorTable[8][8]) {
     attacking.clear();
+    if (!isOnBoard()) {
+        return attacking;
+    }
     cell position = getPos();
     int xPosition = position.getX();
     int yPosition = position.getY();
@@ -219,6 +237,9 @@ queen::queen(cell givenCell) {
 
 vector <cell> queen::canGo(playerColor color, playerColor colorTable[8][8]) {
     attacking.clear();
+    if (!isOnBoard()) {
+        return attacking;
+    }
     cell position = getPos();
     int xPosition = position.getX();
     int yPosition = position.getY();
@@ -362,6 +383,9 @@ rook::rook(cell givenCell) {
 
 vector <cell> rook::canGo(playerColor color, playerColor colorTable[8][8]) {
     attacking.clear();
+    if (!isOnBoard()) {
+        return attacking;
+    }
     cell position = getPos();
     int xPosition = position.getX();
     int yPosition = position.getY();
@@ -442,6 +466,9 @@ bishop::bishop(cell givenCell) {
 
 vector <cell> bishop::canGo(playerColor color, playerColor colorTable[8][8]) {
     attacking.clear();
+    if (!isOnBoard()) {
+        return attacking;
+    }
     cell position = getPos();
     int xPosition = position.getX();
     int yPosition = position.getY();
@@ -521,6 +548,9 @@ knight::knight(cell givenCell) {
 
 vector <cell> knight::canGo(playerColor color, playerColor colorTable[8][8]) {
     attacking.clear();
+    if (!isOnBoard()) {
+        return attacking;
+    }
     cell position = getPos();
     int xPosition = position.getX();
     int yPosition = position.getY();
@@ -625,6 +655,9 @@ map <playerColor, playerColor> rivalMap;
 
 vector <cell> pawn::canGo(playerColor color, playerColor colorTable[8][8]) {
     attacking.clear();
+    if (!isOnBoard()) {
+        return attacking;
+    }
     cell position = getPos();
     int xPosition = position.getX();
     int yPosition = position.getY();
@@ -819,7 +852,7 @@ class board {
 public:
     board();
     void fillDangerous(player*);
-    void updateBoard(bool, int, int, bool, bool, bool, bool);
+    void updateBoard(bool, int, int, bool, bool, bool, bool, bool);
     bool isRunning();
     playerColor getTurn();
     bool isChecked(king* defenderKing, playerColor color);
@@ -1038,7 +1071,7 @@ void board::updateAttackingCellGraphics(playerColor attacker, pieceType type, in
 map <playerColor, player> playerMap;
 
 void board::updateBoard(bool firstClick, int firstClickX, int firstClickY, bool checkWhite, bool checkBlack,
-                        bool checkmateWhite, bool checkmateBlack) {
+                        bool checkmateWhite, bool checkmateBlack, bool stalemate) {
     for (int i = 0; i < 8; i++) {
         fill(dangerForBlack[i], dangerForBlack[i] + 8, false);
         fill(dangerForWhite[i], dangerForWhite[i] + 8, false);
@@ -1049,7 +1082,10 @@ void board::updateBoard(bool firstClick, int firstClickX, int firstClickY, bool 
     if (checkmateBlack) {
         background = SDL_LoadBMP("pictures\\backgrounds\\WinnerIsWhite.bmp");
     }
-    if (checkmateBlack || checkmateWhite) {
+    if (stalemate) {
+        background = SDL_LoadBMP("pictures\\backgrounds\\stalemate.bmp");
+    }
+    if (checkmateBlack || checkmateWhite || stalemate) {
         gameIsOver = true;
     }
     SDL_BlitSurface(background, NULL, screenSurface, NULL);
@@ -1248,12 +1284,27 @@ bool board::movePiece(cell starting, cell ending, bool flg) {
     if (!flg && (!isValidMove || table[y2][x2] == King)) {
         return false;
     }
-    cout << table[y][x] << ' ' << table[y2][x2] << endl;
+    //cout << table[y][x] << ' ' << table[y2][x2] << endl;
     swap(table[y][x], table[y2][x2]);
     swap(colorTable[y][x], colorTable[y2][x2]);
     swap(indexTable[y][x], indexTable[y2][x2]);
-    cout << table[y][x] << ' ' << table[y2][x2] << endl;
+    //cout << table[y][x] << ' ' << table[y2][x2] << endl;
     if (table[y][x] != None && !flg) {
+        if (table[y][x] == Queen) {
+            getPlayer(rivalMap[color]) -> getQueen()[indexTable[y][x]] -> killIt();
+        }
+        if (table[y][x] == Bishop) {
+            getPlayer(rivalMap[color]) -> getBishops()[indexTable[y][x]] -> killIt();
+        }
+        if (table[y][x] == Pawn) {
+            getPlayer(rivalMap[color]) -> getPawns()[indexTable[y][x]] -> killIt();
+        }
+        if (table[y][x] == Rook) {
+            getPlayer(rivalMap[color]) -> getRooks()[indexTable[y][x]] -> killIt();
+        }
+        if (table[y][x] == Knight) {
+            getPlayer(rivalMap[color]) -> getKnights()[indexTable[y][x]] -> killIt();
+        }
         table[y][x] = None;
         colorTable[y][x] = none;
     }
@@ -1355,7 +1406,7 @@ bool board::isCheckmated(king* defenderKing, playerColor color) {
             y2 = getPlayer(color) -> getPawns()[j] -> canGo(color, colorTable)[i].getY();
             cell starting(x1, y1), ending(x2, y2);
             movePiece(starting, ending, true);
-            cout << i << endl;
+            //cout << i << endl;
             if (color == White) {
                 fillDangerous(&black);
             }
@@ -1363,7 +1414,48 @@ bool board::isCheckmated(king* defenderKing, playerColor color) {
                 fillDangerous(&white);
             }
             //printBoard();
-            cout << endl;
+            //cout << endl;
+            if(!isChecked(defenderKing, color)) {
+                flg = false;
+            }
+            movePiece(ending, starting, true);
+        }
+    }
+    return flg;
+}
+
+bool board::isStalemated(king* defenderKing, playerColor color) {
+    if (isChecked(defenderKing, color)) {
+        return false;
+    }
+    for (int i = 0; i < defenderKing -> canGo(getColorTable(defenderKing -> getPos()), colorTable).size(); i++) {
+        cell curMove = defenderKing -> canGo(getColorTable(defenderKing -> getPos()), colorTable)[i];
+        if (color == White && !dangerousForWhite[curMove.getY()][curMove.getX()]) {
+            return false;
+        }
+        if (color == Black && !dangerousForBlack[curMove.getY()][curMove.getX()]) {
+            return false;
+        }
+    }
+    bool flg = true;
+    for (int j = 0; j < 8 ; j++) {
+        for (int i = 0; i < getPlayer(color) -> getPawns()[j] -> canGo(color, colorTable).size(); i++) {
+            int x1 , y1 , x2 , y2;
+            x1 = getPlayer(color) -> getPawns()[j] -> getPos().getX();
+            y1 = getPlayer(color) -> getPawns()[j] -> getPos().getY();
+            x2 = getPlayer(color) -> getPawns()[j] -> canGo(color, colorTable)[i].getX();
+            y2 = getPlayer(color) -> getPawns()[j] -> canGo(color, colorTable)[i].getY();
+            cell starting(x1, y1), ending(x2, y2);
+            movePiece(starting, ending, true);
+            //cout << i << endl;
+            if (color == White) {
+                fillDangerous(&black);
+            }
+            if (color == Black) {
+                fillDangerous(&white);
+            }
+            //printBoard();
+            //cout << endl;
             if(!isChecked(defenderKing, color)) {
                 flg = false;
             }
@@ -1411,16 +1503,20 @@ int main(int argc, char* args[]) {
     bool firstClick = true;
     int firstClickX = -1, firstClickY = -1;
     while (game.isRunning()) { //mainLoop
-        bool checkWhite = false, checkBlack = false, checkmateWhite = false, checkmateBlack = false;
+        bool checkWhite = false, checkBlack = false, checkmateWhite = false, checkmateBlack = false, stalemate = false;
         while (game.getTurn() == White && game.isRunning()) {
            while(SDL_PollEvent(&event) && game.getTurn() == White && game.isRunning()) {
                 if (game.isChecked(game.getPlayer(White) -> getKing()[0], White)) {
-                    cout << "CheckkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkWhiteeeeeeeeee\n";
+                    //cout << "CheckkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkWhiteeeeeeeeee\n";
                     checkWhite = true;
                 }
                 if (game.isCheckmated(game.getPlayer(White) -> getKing()[0], White)) {
-                    cout << "CheckkkkkkkkkkkmatttttttttttttttteWhiteeeeeeeeee\n";
+                    //cout << "CheckkkkkkkkkkkmatttttttttttttttteWhiteeeeeeeeee\n";
                     checkmateWhite = true;
+                }
+                if (game.isStalemated(game.getPlayer(White) -> getKing()[0], White)) {
+                    //cout << "CheckkkkkkkkkkkmatttttttttttttttteWhiteeeeeeeeee\n";
+                    stalemate = true;
                 }
                 switch(event.type) {
                     case SDL_QUIT:
@@ -1446,7 +1542,8 @@ int main(int argc, char* args[]) {
                         }
                         //cout << "biaaaaaaaaaaaaaaaaaaa" << game.getTurn() << endl;
                 }
-                game.updateBoard(firstClick, firstClickX, firstClickY, checkWhite, checkBlack, checkmateWhite, checkmateBlack);
+                game.updateBoard(firstClick, firstClickX, firstClickY, checkWhite, checkBlack, checkmateWhite, checkmateBlack,
+                                 stalemate);
                 SDL_Delay(100);
             }
         }
@@ -1454,12 +1551,16 @@ int main(int argc, char* args[]) {
          while (game.getTurn() == Black && game.isRunning()) {
            while(SDL_PollEvent(&event) && game.getTurn() == Black && game.isRunning()) {
                 if (game.isChecked(game.getPlayer(Black) -> getKing()[0], Black)) {
-                    cout << "CheckkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkBlackkkkkkkkkk\n";
+                    //cout << "CheckkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkBlackkkkkkkkkk\n";
                     checkBlack = true;
                 }
                 if (game.isCheckmated(game.getPlayer(Black) -> getKing()[0], Black)) {
-                    cout << "CheckkkkkkkkkkkmatttttttttttttttteBlackkkkkkkkkkk\n";
+                    //cout << "CheckkkkkkkkkkkmatttttttttttttttteBlackkkkkkkkkkk\n";
                     checkmateBlack = true;
+                }
+                if (game.isStalemated(game.getPlayer(Black) -> getKing()[0], Black)) {
+                    //cout << "CheckkkkkkkkkkkmatttttttttttttttteWhiteeeeeeeeee\n";
+                    stalemate = true;
                 }
                 switch(event.type) {
                     case SDL_QUIT:
@@ -1485,12 +1586,13 @@ int main(int argc, char* args[]) {
                         }
                         //cout << "biaa" << game.getTurn() << ' ' << game.getColorTable(current) << endl;
                 }
-                game.updateBoard(firstClick, firstClickX, firstClickY, checkWhite, checkBlack, checkmateWhite, checkmateBlack);
+                game.updateBoard(firstClick, firstClickX, firstClickY, checkWhite, checkBlack, checkmateWhite, checkmateBlack,
+                                 stalemate);
                 SDL_Delay(100);
             }
         }
     }
-    SDL_Delay(70000);
+    SDL_Delay(5000);
     SDL_FreeSurface(screenSurface);
     SDL_DestroyWindow(window);
     window = NULL;
